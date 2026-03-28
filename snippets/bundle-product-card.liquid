@@ -1,0 +1,81 @@
+
+{%- comment -%} snippets/bundle-product-card.liquid {%- endcomment -%}
+{%- liquid
+  assign featured_image = product.featured_image
+  assign first_variant   = product.variants.first
+  assign is_single       = single_select | default: false
+-%}
+<div
+  class="bb-card"
+  data-product-id="{{ product.id }}"
+  data-step="{{ step }}"
+  data-single="{{ is_single }}"
+  data-product-handle="{{ product.handle }}"
+  role="button"
+  tabindex="0"
+  aria-pressed="false"
+  aria-label="Select {{ product.title }}"
+>
+  <div class="bb-card__image-wrap">
+    {%- if featured_image -%}
+      <img
+        class="bb-card__image"
+        src="{{ featured_image | image_url: width: 400 }}"
+        alt="{{ featured_image.alt | escape }}"
+        loading="lazy"
+        width="400"
+        height="{{ 400 | divided_by: featured_image.aspect_ratio | round }}"
+      >
+    {%- else -%}
+      <div class="bb-card__image bb-card__image--placeholder">
+        {{ 'product-1' | placeholder_svg_tag: 'bb-card__placeholder-svg' }}
+      </div>
+    {%- endif -%}
+    <div class="bb-card__check-badge" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    </div>
+    {%- unless product.available -%}
+      <div class="bb-card__badge bb-card__badge--oos">Out of Stock</div>
+    {%- endunless -%}
+  </div>
+
+  <div class="bb-card__info">
+    <h3 class="bb-card__title">{{ product.title }}</h3>
+    <p class="bb-card__price" data-price="{{ first_variant.price }}">
+      {{ first_variant.price | money }}
+    </p>
+
+    {%- if product.variants.size > 1 -%}
+      <div class="bb-card__variants">
+        <label class="bb-card__variants-label" for="variant-{{ product.id }}">
+          {%- if product.options.first == 'Size' -%}Size{%- else -%}Option{%- endif -%}:
+        </label>
+        <select
+          id="variant-{{ product.id }}"
+          class="bb-card__variant-select"
+          data-product-id="{{ product.id }}"
+          aria-label="Select variant for {{ product.title }}"
+        >
+          {%- for variant in product.variants -%}
+            <option
+              value="{{ variant.id }}"
+              data-price="{{ variant.price }}"
+              {%- unless variant.available -%} disabled{%- endunless -%}
+            >
+              {{ variant.title }}
+              {%- unless variant.available -%} — Out of Stock{%- endunless -%}
+            </option>
+          {%- endfor -%}
+        </select>
+      </div>
+    {%- else -%}
+      <input
+        type="hidden"
+        class="bb-card__variant-select"
+        data-product-id="{{ product.id }}"
+        value="{{ first_variant.id }}"
+        data-price="{{ first_variant.price }}"
+      >
+    {%- endif -%}
+  </div>
+</div>

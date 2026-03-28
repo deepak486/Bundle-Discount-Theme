@@ -1,0 +1,28 @@
+
+{%- comment -%} snippets/bundle-pricing-panel.liquid {%- endcomment -%}
+<div class="bb-pricing{% if mobile %} bb-pricing--mobile{% endif %}" id="{% if mobile %}bb-pricing-mobile{% else %}bb-pricing-desktop{% endif %}">
+  <h3 class="bb-pricing__title">Your Bundle</h3>
+
+  <ul class="bb-pricing__items" id="{% if mobile %}bb-pricing-items-mobile{% else %}bb-pricing-items{% endif %}" aria-label="Selected bundle items" aria-live="polite">
+    <li class="bb-pricing__empty">No items selected yet.</li>
+  </ul>
+
+  <div class="bb-pricing__divider"></div>
+
+  <div class="bb-pricing__row">
+    <span>Subtotal</span>
+    <span class="bb-pricing__subtotal" id="{% if mobile %}bb-subtotal-mobile{% else %}bb-subtotal{% endif %}" aria-live="polite">$0.00</span>
+  </div>
+
+  <div class="bb-pricing__discount-row" id="{% if mobile %}bb-discount-row-mobile{% else %}bb-discount-row{% endif %}">
+    <span class="bb-pricing__discount-label" id="{% if mobile %}bb-discount-label-mobile{% else %}bb-discount-label{% endif %}"></span>
+    <span class="bb-pricing__discount-amount" id="{% if mobile %}bb-discount-amount-mobile{% else %}bb-discount-amount{% endif %}"></span>
+  </div>
+
+  <div class="bb-pricing__row bb-pricing__row--total">
+    <span>Total</span>
+    <span class="bb-pricing__total" id="{% if mobile %}bb-total-mobile{% else %}bb-total{% endif %}" aria-live="assertive">$0.00</span>
+  </div>
+
+  <div class="bb-pricing__upsell" id="{% if mobile %}bb-upsell-mobile{% else %}bb-upsell{% endif %}" aria-live="polite"></div>
+</div>

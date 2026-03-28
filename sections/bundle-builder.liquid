@@ -1,0 +1,340 @@
+
+{%- comment -%} sections/bundle-builder.liquid {%- endcomment -%}
+
+{%- liquid
+  assign shirts_collection     = collections[section.settings.shirts_collection]
+  assign accessories_collection = collections[section.settings.accessories_collection]
+  assign extras_collection     = collections[section.settings.extras_collection]
+  assign products_per_step     = section.settings.products_per_step
+  assign enable_extras         = section.settings.enable_extras
+  assign total_steps           = 4
+  if enable_extras == false
+    assign total_steps = 3
+  endif
+-%}
+
+<div
+  id="bundle-builder"
+  class="bb-wrapper"
+  data-section-id="{{ section.id }}"
+  data-tier1-threshold="{{ section.settings.tier1_threshold }}"
+  data-tier1-discount="{{ section.settings.tier1_discount }}"
+  data-tier2-threshold="{{ section.settings.tier2_threshold }}"
+  data-tier2-discount="{{ section.settings.tier2_discount }}"
+  data-tier3-threshold="{{ section.settings.tier3_threshold }}"
+  data-tier3-discount="{{ section.settings.tier3_discount }}"
+  data-enable-extras="{{ enable_extras }}"
+  data-total-steps="{{ total_steps }}"
+  style="
+    --bb-accent: {{ section.settings.accent_color }};
+    --bb-bg: {{ section.settings.bg_color }};
+  "
+>
+
+  {%- comment -%} ── PROGRESS BAR ── {%- endcomment -%}
+  <div class="bb-progress" role="navigation" aria-label="Bundle builder steps">
+    {%- for i in (1..total_steps) -%}
+      <div
+        class="bb-progress__step"
+        data-step="{{ i }}"
+        aria-label="Step {{ i }} of {{ total_steps }}"
+      >
+        <div class="bb-progress__circle">
+          <span class="bb-progress__num">{{ i }}</span>
+          <svg class="bb-progress__check" viewBox="0 0 24 24" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <span class="bb-progress__label">
+          {%- case i -%}
+            {%- when 1 -%}{{ section.settings.step1_heading | default: 'Choose Shirt' }}
+            {%- when 2 -%}{{ section.settings.step2_heading | default: 'Choose Accessory' }}
+            {%- when 3 -%}
+              {%- if enable_extras -%}{{ section.settings.step3_heading | default: 'Add Extras' }}
+              {%- else -%}{{ section.settings.step4_heading | default: 'Review' }}{%- endif -%}
+            {%- when 4 -%}{{ section.settings.step4_heading | default: 'Review' }}
+          {%- endcase -%}
+        </span>
+      </div>
+      {%- unless forloop.last -%}<div class="bb-progress__line"><div class="bb-progress__line-fill"></div></div>{%- endunless -%}
+    {%- endfor -%}
+  </div>
+
+  {%- comment -%} ── MAIN AREA ── {%- endcomment -%}
+  <div class="bb-main">
+
+    {%- comment -%} ── STEPS CONTAINER ── {%- endcomment -%}
+    <div class="bb-steps" aria-live="polite">
+
+      {%- comment -%} STEP 1: SHIRTS {%- endcomment -%}
+      <div class="bb-step" data-step="1" role="region" aria-label="{{ section.settings.step1_heading | default: 'Choose a Shirt' }}">
+        <h2 class="bb-step__heading">{{ section.settings.step1_heading | default: 'Step 1: Choose a Shirt' }}</h2>
+        <p class="bb-step__sub">Select one shirt and pick your size.</p>
+        <div class="bb-grid bb-grid--3" id="bb-shirts-grid">
+          {%- for product in shirts_collection.products limit: products_per_step -%}
+            {%- render 'bundle-product-card', product: product, step: 1, single_select: true -%}
+          {%- else -%}
+            <p class="bb-empty">No shirts found in the selected collection.</p>
+          {%- endfor -%}
+        </div>
+        <div class="bb-step__nav">
+          <button class="bb-btn bb-btn--primary bb-btn--next" data-step="1" disabled aria-disabled="true">
+            Continue to Step 2
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+      </div>
+
+      {%- comment -%} STEP 2: ACCESSORIES (lazy loaded) {%- endcomment -%}
+      <div class="bb-step bb-step--hidden" data-step="2" role="region" aria-label="{{ section.settings.step2_heading | default: 'Choose an Accessory' }}"
+        data-collection="{{ accessories_collection.handle }}"
+        data-limit="{{ products_per_step }}">
+        <h2 class="bb-step__heading">{{ section.settings.step2_heading | default: 'Step 2: Choose an Accessory' }}</h2>
+        <p class="bb-step__sub">Select one accessory.</p>
+        <div class="bb-grid bb-grid--3" id="bb-accessories-grid">
+          <div class="bb-loader" aria-label="Loading accessories...">
+            <div class="bb-spinner" role="status"></div>
+          </div>
+        </div>
+        <div class="bb-step__nav">
+          <button class="bb-btn bb-btn--ghost bb-btn--prev" data-step="2">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Back
+          </button>
+          <button class="bb-btn bb-btn--primary bb-btn--next" data-step="2" disabled aria-disabled="true">
+            Continue to Step 3
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+      </div>
+
+      {%- comment -%} STEP 3: EXTRAS (lazy loaded, optional) {%- endcomment -%}
+      {%- if enable_extras -%}
+      <div class="bb-step bb-step--hidden" data-step="3" role="region" aria-label="{{ section.settings.step3_heading | default: 'Add Extras' }}"
+        data-collection="{{ extras_collection.handle }}"
+        data-limit="{{ products_per_step }}">
+        <h2 class="bb-step__heading">{{ section.settings.step3_heading | default: 'Step 3: Add Extras (Optional)' }}</h2>
+        <p class="bb-step__sub">Pick as many extras as you like — or skip this step.</p>
+        <div class="bb-grid bb-grid--3" id="bb-extras-grid">
+          <div class="bb-loader" aria-label="Loading extras...">
+            <div class="bb-spinner" role="status"></div>
+          </div>
+        </div>
+        <div class="bb-step__nav">
+          <button class="bb-btn bb-btn--ghost bb-btn--prev" data-step="3">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Back
+          </button>
+          <button class="bb-btn bb-btn--primary bb-btn--next" data-step="3">
+            Continue to Review
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+      </div>
+      {%- endif -%}
+
+      {%- comment -%} STEP 4: REVIEW {%- endcomment -%}
+      <div class="bb-step bb-step--hidden" data-step="{{ total_steps }}" role="region" aria-label="Review your bundle">
+        <h2 class="bb-step__heading">{{ section.settings.step4_heading | default: 'Review Your Bundle' }}</h2>
+        <div id="bb-review-summary" class="bb-review"></div>
+        <div class="bb-step__nav bb-step__nav--review">
+          <button class="bb-btn bb-btn--ghost bb-btn--prev" data-step="{{ total_steps }}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Back
+          </button>
+          <button class="bb-btn bb-btn--atc" id="bb-atc-btn" aria-live="polite">
+            <span class="bb-btn__label">Add Bundle to Cart</span>
+            <span class="bb-btn__spinner" aria-hidden="true"></span>
+            <svg class="bb-btn__check" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>{%- comment -%} end bb-steps {%- endcomment -%}
+
+    {%- comment -%} ── SIDEBAR PRICING (desktop) ── {%- endcomment -%}
+    <aside class="bb-sidebar" aria-label="Bundle pricing summary">
+      {%- render 'bundle-pricing-panel' -%}
+    </aside>
+
+  </div>{%- comment -%} end bb-main {%- endcomment -%}
+
+  {%- comment -%} ── MOBILE STICKY BAR ── {%- endcomment -%}
+  {%- if section.settings.enable_mobile_sticky -%}
+  <div class="bb-mobile-bar" id="bb-mobile-bar" aria-label="Bundle total">
+    <div class="bb-mobile-bar__summary">
+      <span class="bb-mobile-bar__count"><span id="bb-mob-count">0</span> items</span>
+      <span class="bb-mobile-bar__total">
+        <span class="bb-mobile-bar__label">Total:</span>
+        <span id="bb-mob-total">$0.00</span>
+      </span>
+    </div>
+    <button class="bb-mobile-bar__toggle" id="bb-mob-toggle" aria-expanded="false" aria-controls="bb-mobile-sheet">
+      View Summary
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>
+    </button>
+  </div>
+  <div class="bb-mobile-sheet" id="bb-mobile-sheet" aria-hidden="true">
+    <div class="bb-mobile-sheet__inner">
+      <button class="bb-mobile-sheet__close" id="bb-mob-close" aria-label="Close pricing summary">✕</button>
+      {%- render 'bundle-pricing-panel', mobile: true -%}
+    </div>
+  </div>
+  {%- endif -%}
+
+  {%- comment -%} ── CONFIRMATION OVERLAY ── {%- endcomment -%}
+  <div class="bb-confirmation" id="bb-confirmation" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Bundle added to cart">
+    <div class="bb-confirmation__inner">
+      <div class="bb-confirmation__icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <h2 class="bb-confirmation__title">Bundle Added!</h2>
+      <div id="bb-confirmation-summary" class="bb-confirmation__summary"></div>
+      <div class="bb-confirmation__actions">
+        <a href="/collections/all" class="bb-btn bb-btn--ghost">Continue Shopping</a>
+        <a href="/checkout" class="bb-btn bb-btn--primary">Go to Checkout</a>
+      </div>
+    </div>
+  </div>
+
+</div>{%- comment -%} end bb-wrapper {%- endcomment -%}
+
+{% schema %}
+{
+  "name": "Bundle Builder",
+  "tag": "section",
+  "class": "section-bundle-builder",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collections"
+    },
+    {
+      "type": "collection",
+      "id": "shirts_collection",
+      "label": "Shirts Collection (Step 1)"
+    },
+    {
+      "type": "collection",
+      "id": "accessories_collection",
+      "label": "Accessories Collection (Step 2)"
+    },
+    {
+      "type": "collection",
+      "id": "extras_collection",
+      "label": "Extras Collection (Step 3)"
+    },
+    {
+      "type": "range",
+      "id": "products_per_step",
+      "label": "Products per Step",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Step Headings"
+    },
+    {
+      "type": "text",
+      "id": "step1_heading",
+      "label": "Step 1 Heading",
+      "default": "Step 1: Choose a Shirt"
+    },
+    {
+      "type": "text",
+      "id": "step2_heading",
+      "label": "Step 2 Heading",
+      "default": "Step 2: Choose an Accessory"
+    },
+    {
+      "type": "text",
+      "id": "step3_heading",
+      "label": "Step 3 Heading",
+      "default": "Step 3: Add Extras"
+    },
+    {
+      "type": "text",
+      "id": "step4_heading",
+      "label": "Step 4 Heading",
+      "default": "Review Your Bundle"
+    },
+    {
+      "type": "header",
+      "content": "Discount Tiers"
+    },
+    {
+      "type": "number",
+      "id": "tier1_threshold",
+      "label": "Tier 1 — Min Items",
+      "default": 2,
+      "info": "Items needed to unlock Tier 1 discount"
+    },
+    {
+      "type": "number",
+      "id": "tier1_discount",
+      "label": "Tier 1 — Discount %",
+      "default": 10
+    },
+    {
+      "type": "number",
+      "id": "tier2_threshold",
+      "label": "Tier 2 — Min Items",
+      "default": 3
+    },
+    {
+      "type": "number",
+      "id": "tier2_discount",
+      "label": "Tier 2 — Discount %",
+      "default": 15
+    },
+    {
+      "type": "number",
+      "id": "tier3_threshold",
+      "label": "Tier 3 — Min Items",
+      "default": 5
+    },
+    {
+      "type": "number",
+      "id": "tier3_discount",
+      "label": "Tier 3 — Discount %",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Display Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_extras",
+      "label": "Enable Extras Step (Step 3)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_mobile_sticky",
+      "label": "Enable Sticky Pricing Bar on Mobile",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#1a1a2e"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f8f8f8"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bundle Builder"
+    }
+  ]
+}
+{% endschema %}
