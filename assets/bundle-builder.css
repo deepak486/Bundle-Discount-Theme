@@ -509,6 +509,9 @@
   .bb-progress__circle { width: 32px; height: 32px; }
   .bb-review__item { flex-wrap: wrap; }
   .bb-confirmation__inner { padding: 28px 20px; }
+  .bb-progress__line{
+    margin-bottom: 0px;
+  }
 }
 
 /* ── PRINT / REDUCED MOTION ── */

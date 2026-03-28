@@ -624,9 +624,6 @@
 
       setBtnState('success');
 
-      // Apply discount code if configured
-      if (p.discountPct > 0) await applyDiscount(p.discountPct);
-
       setTimeout(() => {
         showConfirmation(p, bundleId);
         state.isSubmitting = false;
@@ -650,19 +647,7 @@
     }
   }
 
-  async function applyDiscount (pct) {
-    // Automatic discount codes strategy:
-    // For Shopify Plus → use Shopify Scripts (managed outside JS)
-    // For non-Plus → apply a pre-created automatic discount code
-    // The discount code should be configured in Shopify Admin as BUNDLE10, BUNDLE15, BUNDLE20
-    const codeMap = { 10: 'BUNDLE10', 15: 'BUNDLE15', 20: 'BUNDLE20' };
-    const code = codeMap[pct];
-    if (!code) return;
-
-    try {
-      await fetch('/discount/' + code, { method: 'GET' });
-    } catch (_) { /* non-critical, discount application is best-effort here */ }
-  }
+ 
 
   function setBtnState (state) {
     if (!atcBtn) return;
