@@ -1,3 +1,3 @@
-{%- comment -%} templates/page.bundle-builder.liquid {%- endcomment -%}
-{{ content_for_header }}
+{{ 'bundle-builder.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bundle-builder.js' | asset_url }}" defer></script>
 {%- section 'bundle-builder' -%}

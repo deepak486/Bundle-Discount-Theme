@@ -474,11 +474,11 @@
     const variant   = product.variants[0];
     const available = product.variants.some(v => v.available);
     const imgSrc    = img ? img.src.replace(/(\.[^.]*)$/, '_400x$1') : '';
-
+   console.log(product.options[0].name);
     const variantOptions = product.variants.length > 1
       ? `<div class="bb-card__variants">
            <label class="bb-card__variants-label" for="variant-${product.id}">
-             ${product.options[0] || 'Option'}:
+             ${product.options[0].name }:
            </label>
            <select id="variant-${product.id}" class="bb-card__variant-select" data-product-id="${product.id}" aria-label="Select variant for ${product.title}">
              ${product.variants.map(v =>

@@ -47,7 +47,7 @@
 
     {%- if product.variants.size > 1 -%}
       <div class="bb-card__variants">
-        <label class="bb-card__variants-label" for="variant-{{ product.id }}">
+        <label class="bb-card__variants-label Option_label" for="variant-{{ product.id }}">
           {%- if product.options.first == 'Size' -%}Size{%- else -%}Option{%- endif -%}:
         </label>
         <select
