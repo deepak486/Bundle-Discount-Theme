@@ -37,13 +37,16 @@ A custom multi-step bundle builder section for Shopify themes that allows custom
 
 ```
 theme/
+├── templates/
+│   └── page.bundle-builder.liquid       # Page template 
 ├── sections/
 │   └── bundle-builder.liquid       # Section template + schema settings
 ├── assets/
 │   ├── bundle-builder.js           # Core JS logic (state, pricing, cart)
 │   └── bundle-builder.css          # All styles (steps, cards, pricing, mobile)
 └── snippets/
-    └── bundle-card.liquid          # (optional) Pre-rendered shirt card snippet
+    └── bundle-product-card.liquid     # For product card rendering    
+    └── bundle-pricing-panel.liquid     # For right side price panel   
 ```
 
 ***
